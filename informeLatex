@@ -1,0 +1,258 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage[margin=2.3cm,headheight=16pt]{geometry}
+\usepackage{amsmath,amssymb,graphicx,booktabs,array,xcolor,hyperref,float,caption,enumitem,fancyhdr,tcolorbox,pgfplots,tikz}
+\pgfplotsset{compat=1.18}
+\definecolor{azulUD}{RGB}{15,52,96}
+\definecolor{rojoUD}{RGB}{233,69,96}
+\definecolor{verdeOK}{RGB}{39,174,96}
+\hypersetup{colorlinks=true,linkcolor=azulUD,urlcolor=rojoUD}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\textcolor{azulUD}{Métodos Numéricos --- Integración Numérica}}
+\fancyhead[R]{\small\textcolor{azulUD}{UMSA}}
+\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0.4pt}
+\newtcolorbox{cajaInfo}[1][]{colback=azulUD!5,colframe=azulUD,fonttitle=\bfseries,title=#1,boxrule=0.5pt,arc=3pt}
+\newtcolorbox{cajaResultado}[1][]{colback=verdeOK!7,colframe=verdeOK,fonttitle=\bfseries,title=#1,boxrule=0.5pt,arc=3pt}
+\title{\vspace{-1.5cm}\textcolor{azulUD}{\rule{\linewidth}{1.5pt}}\\[0.3cm]\textbf{\Large Informe: Integración Numérica Aplicada}\\[0.2cm]\textbf{\large Ejercicios 19 al 27}\\[0.2cm]\textcolor{azulUD}{\rule{\linewidth}{1.5pt}}}
+\author{\textbf{Murillo Peñaranda Mario Fabricio}\\\textbf{Morales Nina Yandira Enilse}\\[0.2cm]\textit{Ingeniería de Sistemas e Inteligencia Artificial y Ciencia de Datos}\\\textit{Métodos Numéricos --- Universidad Mayor de San Andrés, La Paz, Bolivia}}
+\date{27 de octubre de 2026}
+\begin{document}
+\maketitle
+\begin{cajaInfo}[Propósito del trabajo]
+Resolver los ejercicios 19--27 mediante integración numérica, comparar los métodos compatibles con los datos y relacionar los cálculos con una aplicación web para las dos menciones.
+\end{cajaInfo}
+\tableofcontents\newpage
+\section{Introducción}
+La integración numérica aproxima integrales definidas a partir de funciones o mediciones discretas. En Ingeniería de Sistemas permite procesar señales de sensores, telemetría y datos de monitoreo. En Inteligencia Artificial y Ciencia de Datos interviene en análisis geoespacial, simulación, robótica y reconstrucción tridimensional. Se desarrollan los ejercicios 19--27, indicando las restricciones de cada método y la interpretación de los resultados.
+\section{Marco teórico}
+Sean $x_i=a+ih$, $h=(b-a)/n$ y $f_i=f(x_i)$. Las fórmulas compuestas son:
+\begin{align}
+T_n&=\frac h2\left[f_0+f_n+2\sum_{i=1}^{n-1}f_i\right],\\
+S_{1/3,n}&=\frac h3\left[f_0+f_n+4\sum_{\substack{1\le i<n\\i\text{ impar}}}f_i+2\sum_{\substack{2\le i<n\\i\text{ par}}}f_i\right],\quad n\text{ par},\\
+S_{3/8,n}&=\frac{3h}{8}\left[f_0+f_n+3\sum_{\substack{1\le i<n\\3\nmid i}}f_i+2\sum_{\substack{1\le i<n\\3\mid i}}f_i\right],\quad 3\mid n.
+\end{align}
+Para $n$ incompatible con una regla de Simpson, se pueden combinar reglas en tramos consecutivos sin cambiar el espaciamiento. Cuando se conoce una referencia independiente, $E_a=|I_{\mathrm{ref}}-I_{\mathrm{num}}|$ y $E\%=100E_a/|I_{\mathrm{ref}}|$. Sin referencia exacta, las diferencias entre métodos no son errores verdaderos. Para funciones suficientemente suaves, trapecio tiene error global $O(h^2)$ y Simpson $1/3$ y $3/8$ tienen orden $O(h^4)$.
+\section{Ejercicios 19--23: Ingeniería de Sistemas}
+\subsection{Ejercicio 19: distancia a partir de velocidades registradas}
+Se estima la distancia a partir de velocidades medidas cada segundo. El factor $1/3600$ convierte segundos a horas:
+\[d=\frac1{3600}\int_0^7v(t)\,dt,\qquad h=1,\quad n=7.\]
+\begin{table}[H]\centering\caption{Velocidad medida}\small\begin{tabular}{c*{8}{r}}\toprule$t$ (s)&0&1&2&3&4&5&6&7\\\midrule$v$ (mi/h)&0&14&39&69&95&114&129&139\\\bottomrule\end{tabular}\end{table}
+\begin{align*}
+T&=\tfrac12[0+139+2(14+39+69+95+114+129)]=529.5,\\
+d_T&=529.5/3600=\boxed{0.147083333\ \mathrm{mi}}.
+\end{align*}
+Con siete subintervalos se aplica Simpson $1/3$ en los primeros cuatro y $3/8$ en los últimos tres:
+\begin{align*}
+S_1&=\tfrac13[0+95+4(14+69)+2(39)]=168.333333,\\
+S_2&=\tfrac38[95+139+3(114+129)]=361.125,\\
+d_S&=(168.333333+361.125)/3600=\boxed{0.147071759\ \mathrm{mi}}.
+\end{align*}
+\textbf{Aplicación en Sistemas:} integración de telemetría GPS para seguimiento vehicular y paneles de monitoreo.
+\subsection{Ejercicio 20: trabajo mecánico de una banda elástica}
+\[W=\int_0^{2.8}F(x)\,dx,\qquad n=7,\quad h=0.4.\]
+\begin{table}[H]\centering\caption{Fuerza y desplazamiento}\small\begin{tabular}{c*{8}{r}}\toprule$x$ (in)&0&0.4&0.8&1.2&1.6&2.0&2.4&2.8\\\midrule$F$ (lb)&0&0.85&1.30&1.60&1.87&2.14&2.34&2.52\\\bottomrule\end{tabular}\end{table}
+\begin{align*}
+T&=\tfrac{0.4}{2}[0+2.52+2(0.85+1.30+1.60+1.87+2.14+2.34)]\\
+ &=\boxed{4.544000\ \mathrm{lb\cdot in}},\\
+S_1&=\tfrac{0.4}{3}[0+1.87+4(0.85+1.60)+2(1.30)]=1.902666667,\\
+S_2&=\tfrac{3(0.4)}8[1.87+2.52+3(2.14+2.34)]=2.674500,\\
+S&=1.902666667+2.674500=\boxed{4.577166667\ \mathrm{lb\cdot in}}\\
+ &\approx\boxed{0.517141\ \mathrm{J}}.
+\end{align*}
+La conversión utiliza $1\ \mathrm{lb_f\cdot in}=0.112984829\ \mathrm{J}$. \textbf{Aplicación en Sistemas:} adquisición de señales de sensores de fuerza y desplazamiento.
+\subsection{Ejercicio 21: área de un perfil topográfico digitalizado}
+\[A=\int_1^{10}f(x)\,dx,\qquad h=1,\quad n=9.\]
+\begin{table}[H]\centering\caption{Coordenadas digitalizadas aproximadas}\scriptsize\begin{tabular}{c*{10}{r}}\toprule$x$&1&2&3&4&5&6&7&8&9&10\\\midrule$y$&1.3&3.7&4.6&4.4&2.7&2.5&3.6&5.3&6.0&5.9\\\bottomrule\end{tabular}\end{table}
+\begin{align*}
+T&=\tfrac12[1.3+5.9+2(3.7+4.6+4.4+2.7+2.5+3.6+5.3+6.0)]\\
+ &=\boxed{36.40\ \mathrm{u}^2},\\
+S_{1/3,[1,9]}&=\tfrac13[1.3+6.0+4(3.7+4.4+2.5+5.3)+2(4.6+2.7+3.6)]\\
+ &=30.90,\\
+T_{[9,10]}&=\tfrac12(6.0+5.9)=5.95,\\
+A_{\mathrm{mixto}}&=30.90+5.95=\boxed{36.85\ \mathrm{u}^2}.
+\end{align*}
+También es posible aplicar Simpson $3/8$ compuesto a los nueve subintervalos:
+\begin{align*}
+S_{3/8}&=\tfrac38[1.3+5.9+3(3.7+4.6+2.7+2.5+5.3+6.0)\\
+&\qquad+2(4.4+3.6)]=\boxed{36.60\ \mathrm{u}^2}.
+\end{align*}
+\textbf{Aplicación en Sistemas:} procesamiento de perfiles digitalizados en sistemas de información geográfica. Los datos aproximados no permiten determinar un error exacto.
+\subsection{Ejercicio 22: longitud de un cable suspendido}
+Para $y(x)=24\cosh(x/24)$ en $[-12,26]$ pies, $y'(x)=\sinh(x/24)$ y $\sqrt{1+\sinh^2(x/24)}=\cosh(x/24)$:
+\[L=\int_{-12}^{26}\cosh(x/24)\,dx,\qquad h=38/8=4.75.\]
+\begin{table}[H]\centering\caption{Nodos de la catenaria con $n=8$}\small\begin{tabular}{rrr|rrr}\toprule $i$&$x_i$&$f_i$&$i$&$x_i$&$f_i$\\\midrule
+0 & -12.00 & 1.127626 & 5 & 11.75 & 1.122259\\
+1 & -7.25 & 1.045975 & 6 & 16.50 & 1.245785\\
+2 & -2.50 & 1.005430 & 7 & 21.25 & 1.418268\\
+3 & 2.25 & 1.004398 & 8 & 26.00 & 1.646488\\
+4 & 7.00 & 1.042837 &  &  & \\
+\bottomrule\end{tabular}\end{table}
+\begin{align*}
+T&=\tfrac{4.75}{2}[f_0+f_8+2(f_1+f_2+f_3+f_4+f_5+f_6+f_7)]\\
+ &=\boxed{44.042044\ \mathrm{ft}},\\
+S_{1/3}&=\tfrac{4.75}{3}[f_0+f_8+4(f_1+f_3+f_5+f_7)+2(f_2+f_4+f_6)]\\
+ &=\boxed{43.899213\ \mathrm{ft}},\\
+L_{\mathrm{exacto}}&=24[\sinh(26/24)-\sinh(-12/24)]\\
+ &=\boxed{43.898841\ \mathrm{ft}}.
+\end{align*}
+\begin{table}[H]\centering\caption{Comparación de longitudes}\begin{tabular}{lrr}\toprule Método&Longitud (ft)&Error relativo (\%)\\\midrule Trapecio&44.042044&0.32621\\ Simpson $1/3$&43.899213&0.00085\\ Exacto&43.898841&0\\\bottomrule\end{tabular}\end{table}
+\textbf{Aplicación en Sistemas:} modelado y simulación de cableado en infraestructuras de telecomunicaciones.
+\subsection{Ejercicio 23: caudal en una tubería}
+Con $R=0.25$ in y $v(r)=80(1-r/R)^{1/7}$:
+\[Q=\int_0^{0.25}160\pi r(1-4r)^{1/7}\,dr,\qquad h=0.03125,\ n=8.\]
+\begin{table}[H]\centering\caption{Nodos de $f(r)=160\pi r(1-4r)^{1/7}$}\small\begin{tabular}{rrr|rrr}\toprule $i$&$r_i$&$f_i$&$i$&$x_i$&$f_i$\\\midrule
+0 & 0.00000 & 0.000000 & 5 & 0.15625 & 68.271148\\
+1 & 0.03125 & 15.411159 & 6 & 0.18750 & 77.314786\\
+2 & 0.06250 & 30.150983 & 7 & 0.21875 & 81.696803\\
+3 & 0.09375 & 44.063717 & 8 & 0.25000 & 0.000000\\
+4 & 0.12500 & 56.908296 &  &  & \\
+\bottomrule\end{tabular}\end{table}
+\begin{align*}
+T&=\tfrac{0.03125}{2}[f_0+f_8+2(f_1+f_2+f_3+f_4+f_5+f_6+f_7)]\\
+ &=\boxed{11.681778\ \mathrm{in}^3/\mathrm{s}},\\
+S_{1/3}&=\tfrac{0.03125}{3}[f_0+f_8+4(f_1+f_3+f_5+f_7)+2(f_2+f_4+f_6)]\\
+ &=\boxed{12.151244\ \mathrm{in}^3/\mathrm{s}}.
+\end{align*}
+Con $u=r/R$, la integral exacta es:
+\begin{align*}
+Q&=160\pi R^2\int_0^1u(1-u)^{1/7}\,du\\
+ &=10\pi\left(\frac78-\frac7{15}\right)=\boxed{\frac{49\pi}{12}=12.828170\ \mathrm{in}^3/\mathrm{s}}.
+\end{align*}
+Los errores relativos son aproximadamente $8.94\%$ (trapecio) y $5.28\%$ (Simpson $1/3$). La derivada no está acotada al aproximarse al extremo $r=R$, por lo que la convergencia puede ser más lenta que para funciones suaves. \textbf{Aplicación en Sistemas:} monitoreo de caudales en redes IoT.
+\subsection{Gráficas de los ejercicios de Sistemas}
+\begin{figure}[H]\centering
+\begin{tikzpicture}\begin{axis}[width=.82\textwidth,height=6cm,xlabel={$t$ (s)},ylabel={$v(t)$ (mi/h)},grid=major]
+\addplot[azulUD,thick,mark=*] coordinates {(0,0)(1,14)(2,39)(3,69)(4,95)(5,114)(6,129)(7,139)};
+\end{axis}\end{tikzpicture}\caption{Ejercicio 19: velocidades registradas.}\end{figure}
+\begin{figure}[H]\centering
+\begin{tikzpicture}\begin{axis}[width=.82\textwidth,height=6cm,xlabel={$x$ (ft)},ylabel={$\cosh(x/24)$},domain=-12:26,samples=100,grid=major]
+\addplot[azulUD,thick]{cosh(x/24)};
+\addplot[only marks,mark=*,rojoUD] coordinates {(-12,1.127626)(-7.25,1.045975)(-2.5,1.005430)(2.25,1.004398)(7,1.042837)(11.75,1.122259)(16.5,1.245785)(21.25,1.418268)(26,1.646488)};
+\end{axis}\end{tikzpicture}\caption{Ejercicio 22: integrando de la longitud del cable.}\end{figure}
+\section{Ejercicios 24--27: Inteligencia Artificial y Ciencia de Datos}
+\subsection{Ejercicio 24: longitud de una cardioide paramétrica}
+Para $b=5$ y $t\in[0,2\pi]$:
+\begin{align*}
+x(t)&=2b\cos t-b\cos2t,&y(t)&=2b\sin t-b\sin2t,\\
+x'(t)&=2b(\sin2t-\sin t),&y'(t)&=2b(\cos t-\cos2t).
+\end{align*}
+Al sumar los cuadrados de las derivadas, se obtiene $[x'(t)]^2+[y'(t)]^2=16b^2\sin^2(t/2)$. Como $\sin(t/2)\ge0$ en el intervalo:
+\[L=\int_0^{2\pi}4b\sin(t/2)\,dt=16b=\boxed{80\ \mathrm{u}}.\]
+\begin{table}[H]\centering\caption{Muestreo de $f(t)=20\sin(t/2)$ con $n=8$}\small\begin{tabular}{rrr|rrr}\toprule $i$&$t_i$&$f_i$&$i$&$x_i$&$f_i$\\\midrule
+0 & 0.0000 & 0.000000 & 5 & 3.9270 & 18.477591\\
+1 & 0.7854 & 7.653669 & 6 & 4.7124 & 14.142136\\
+2 & 1.5708 & 14.142136 & 7 & 5.4978 & 7.653669\\
+3 & 2.3562 & 18.477591 & 8 & 6.2832 & 0.000000\\
+4 & 3.1416 & 20.000000 &  &  & \\
+\bottomrule\end{tabular}\end{table}
+\begin{align*}
+T_8&=\tfrac{\pi/4}{2}[f_0+f_8+2\sum_{i=1}^7f_i]=\boxed{78.969264},\\
+S_{1/3,8}&=\tfrac{\pi/4}{3}[f_0+f_8+4(f_1+f_3+f_5+f_7)+2(f_2+f_4+f_6)]\\
+ &=\boxed{80.010767},\\
+S_{3/8,9}&=\tfrac{3(2\pi/9)}8[f_0+f_9+3\sum_{\substack{1\le i<9\\3\nmid i}}f_i+2(f_3+f_6)]\\
+ &=\boxed{80.015290}.
+\end{align*}
+\begin{table}[H]\centering\caption{Comparación de métodos para la cardioide}\begin{tabular}{lrrr}\toprule Método&$n$&Resultado&Error (\%)\\\midrule Trapecio&8&78.969264&1.28842\\ Simpson $1/3$&8&80.010767&0.01346\\ Simpson $3/8$&9&80.015290&0.01911\\ Exacto&--&80.000000&0\\\bottomrule\end{tabular}\end{table}
+\begin{figure}[H]\centering\begin{tikzpicture}\begin{axis}[width=.8\textwidth,height=6cm,xlabel={$t$ (rad)},ylabel={$f(t)$},domain=0:6.283185,samples=100,grid=major]
+\addplot[azulUD,thick]{20*sin(deg(x/2))};
+\addplot[only marks,rojoUD,mark=*] coordinates {(0,0)(0.785398,7.653669)(1.570796,14.142136)(2.356194,18.477591)(3.141593,20)(3.926991,18.477591)(4.712389,14.142136)(5.497787,7.653669)(6.283185,0)};
+\end{axis}\end{tikzpicture}\caption{Integrando de la longitud de la cardioide.}\end{figure}
+\textbf{Aplicación en IA:} estimación de longitudes de trayectorias en navegación robótica.
+\subsection{Ejercicio 25: energía potencial gravitatoria}
+Datos: $m=500$ kg, $g_0=9.81$ m/s$^2$, $R=6\,371\,000$ m y $H=800\,000$ m. El modelo es $g(y)=g_0R^2/(R+y)^2$.
+\begin{align*}
+\Delta U&=m\int_0^H g(y)\,dy=m g_0R^2\left[-\frac1{R+y}\right]_0^H\\
+&=\frac{m g_0 R H}{R+H}=\boxed{3.486236787\times10^9\ \mathrm{J}}.
+\end{align*}
+Con $n=8$ y $h=100\,000$ m, se calculan las aceleraciones gravitatorias en los nodos:
+\begin{table}[H]\centering\caption{Gravedad calculada en los nueve nodos}\small\begin{tabular}{rrr|rrr}\toprule $i$&$y_i\ (m)$&$g_i\ (m/s^2)$&$i$&$x_i$&$f_i$\\\midrule
+0 & 0 & 9.810000 & 5 & 500\,000 & 8.434208\\
+1 & 100\,000 & 9.509144 & 6 & 600\,000 & 8.193964\\
+2 & 200\,000 & 9.221919 & 7 & 700\,000 & 7.963840\\
+3 & 300\,000 & 8.947513 & 8 & 800\,000 & 7.743277\\
+4 & 400\,000 & 8.685175 &  &  & \\
+\bottomrule\end{tabular}\end{table}
+\begin{align*}
+\Delta U_T&=m\tfrac h2[g_0+g_8+2\sum_{i=1}^{7}g_i]
+=\boxed{3.486620080\times10^9\ \mathrm{J}},\\
+\Delta U_{S_{1/3}}&=m\tfrac h3[g_0+g_8+4(g_1+g_3+g_5+g_7)+2(g_2+g_4+g_6)]\\
+&=\boxed{3.486236900\times10^9\ \mathrm{J}}.
+\end{align*}
+\begin{table}[H]\centering\caption{Energía gravitatoria: resultados corregidos}\begin{tabular}{lrr}\toprule Método&Energía (J)&Error relativo (\%)\\\midrule Trapecio&$3.486620080\times10^9$&0.01099\\ Simpson $1/3$&$3.486236900\times10^9$&0.00000324\\ Exacto&$3.486236787\times10^9$&0\\\bottomrule\end{tabular}\end{table}
+\begin{figure}[H]\centering\begin{tikzpicture}\begin{axis}[width=.8\textwidth,height=6cm,xlabel={Altitud (km)},ylabel={$g(y)$ (m/s$^2$)},domain=0:800,samples=90,grid=major]
+\addplot[azulUD,thick]{9.81*6371^2/(6371+x)^2};\end{axis}\end{tikzpicture}\caption{Disminución de la gravedad con la altitud.}\end{figure}
+\textbf{Aplicación en IA:} simulación de sistemas físicos y estimación numérica de magnitudes.
+\subsection{Ejercicio 26: superficie del lago Titicaca (adaptación didáctica)}
+Los anchos son \emph{ilustrativos}; la referencia de $3232\ \mathrm{mi}^2$ es un dato de comparación, no la integral exacta de una función conocida.
+\begin{table}[H]\centering\caption{Anchos didácticos del lago}\small\begin{tabular}{c*{9}{r}}\toprule$x$ (mi)&0&15&30&45&60&75&90&105&120\\\midrule$w(x)$ (mi)&0&8.5&22&38.5&48&45&32&18.5&0\\\bottomrule\end{tabular}\end{table}
+\begin{align*}
+A&=\int_0^{120}w(x)\,dx,\qquad n=8,\quad h=15,\\
+T&=\tfrac{15}{2}[0+0+2(8.5+22+38.5+48+45+32+18.5)]\\
+ &=\boxed{3187.50\ \mathrm{mi}^2},\\
+S_{1/3}&=\tfrac{15}{3}[0+0+4(8.5+38.5+45+18.5)+2(22+48+32)]\\
+ &=\boxed{3230.00\ \mathrm{mi}^2}.
+\end{align*}
+La diferencia relativa frente a $3232\ \mathrm{mi}^2$ es $1.38\%$ (trapecio) y $0.062\%$ (Simpson). No representa por sí sola el error de digitalización. Simpson $3/8$ compuesto exige $n$ múltiplo de 3; usar $n=9$ requeriría interpolar datos y documentar el procedimiento.
+\begin{figure}[H]\centering\begin{tikzpicture}\begin{axis}[width=.82\textwidth,height=6cm,xlabel={$x$ (millas)},ylabel={$w(x)$ (millas)},grid=major,xtick={0,15,30,45,60,75,90,105,120}]
+\addplot[azulUD,thick,mark=*] coordinates {(0,0)(15,8.5)(30,22)(45,38.5)(60,48)(75,45)(90,32)(105,18.5)(120,0)};\end{axis}\end{tikzpicture}\caption{Perfil de anchuras utilizado en la aproximación.}\end{figure}
+\textbf{Aplicación en IA:} análisis de superficies en imágenes satelitales y datos geoespaciales.
+\subsection{Ejercicio 27: volumen y superficie de un sólido de revolución}
+Se consideran radios $r(z)$ en pulgadas, para $z=0,1,\ldots,12$.
+\begin{table}[H]\centering\caption{Perfil radial del sólido}\scriptsize\begin{tabular}{c*{13}{r}}\toprule$z$&0&1&2&3&4&5&6&7&8&9&10&11&12\\\midrule$r$&0&1.3&1.6&2.4&2.8&3.0&3.1&3.0&2.8&2.4&1.65&1.3&0\\\bottomrule\end{tabular}\end{table}
+\[V=\pi\int_0^{12}r(z)^2\,dz,\qquad S_{\mathrm{simp}}=2\pi\int_0^{12}r(z)\,dz.\]
+Con $h=1$, $n=12$, la suma de cuadrados y radios, respectivamente, da:
+\begin{align*}
+V_T&=\pi(63.472500)=\boxed{199.404740\ \mathrm{in}^3},\\
+V_{1/3}&=\pi(64.248333)=\boxed{201.842092\ \mathrm{in}^3},\\
+V_{3/8}&=\pi(63.4828125)=\boxed{199.437137\ \mathrm{in}^3},\\
+S_{T,\mathrm{simp}}&=2\pi(25.350000)=\boxed{159.278748\ \mathrm{in}^2},\\
+S_{1/3,\mathrm{simp}}&=2\pi(25.833333)=\boxed{162.315620\ \mathrm{in}^2},\\
+S_{3/8,\mathrm{simp}}&=2\pi(25.556250)=\boxed{160.574655\ \mathrm{in}^2}.
+\end{align*}
+\begin{cajaInfo}[Limitación geométrica]
+La expresión $2\pi\int r(z)\,dz$ es una aproximación \emph{simplificada}. El área lateral geométrica correcta es
+\[S_{\mathrm{real}}=2\pi\int_0^{12}r(z)\sqrt{1+[r'(z)]^2}\,dz.\]
+Su cálculo con mediciones tabuladas exige definir cómo se interpola $r(z)$ y cómo se estima su derivada. No se presenta $S_{\mathrm{simp}}$ como área lateral exacta.
+\end{cajaInfo}
+\begin{figure}[H]\centering\begin{tikzpicture}\begin{axis}[width=.8\textwidth,height=6cm,xlabel={$z$ (in)},ylabel={$r(z)$ (in)},grid=major]
+\addplot[azulUD,thick,mark=*] coordinates {(0,0)(1,1.3)(2,1.6)(3,2.4)(4,2.8)(5,3)(6,3.1)(7,3)(8,2.8)(9,2.4)(10,1.65)(11,1.3)(12,0)};\end{axis}\end{tikzpicture}\caption{Perfil radial del sólido de revolución.}\end{figure}
+\textbf{Aplicación en IA:} reconstrucción volumétrica a partir de secciones de objetos.
+\section{Aplicación web: NumeriX AI}
+La aplicación del grupo reúne los ejercicios 19--27, organizados por mención, y propone una interfaz para seleccionar problemas, visualizar datos y comparar métodos de integración. Se emplean tecnologías web HTML, CSS y JavaScript. La comprobación funcional de cada control requiere pruebas en el navegador y evidencias de ejecución.
+\begin{itemize}[leftmargin=*]
+\item Datos de entrada: valores tabulados o funciones, según el ejercicio.
+\item Métodos: trapecio compuesto, Simpson $1/3$, Simpson $3/8$ y combinaciones compatibles.
+\item Verificación: espaciamiento uniforme, valores numéricos y número de subintervalos válido.
+\item Salida: resultado con unidades, tabla de nodos y comparación de métodos.
+\end{itemize}
+\subsection{Prueba matemática de referencia}
+Para $f(x)=x^2$ en $[0,2]$, el resultado exacto es $I=8/3$:
+\begin{table}[H]\centering\caption{Valores esperados de una prueba de integración}\begin{tabular}{rrrr}\toprule$n$&Trapecio&Simpson $1/3$&Error Simpson\\\midrule 4&2.750000&2.666667&0.000000\\ 8&2.687500&2.666667&0.000000\\\bottomrule\end{tabular}\end{table}
+\subsection{Enlaces del proyecto}
+\noindent\textbf{Aplicación publicada mediante GitHub Pages:}\\
+\url{https://yancode31.github.io/desafio27-10/}
+\par\medskip
+\noindent\textbf{Repositorio de código fuente:}\\
+\url{https://github.com/yancode31/desafio27-10}
+\par\medskip
+\section{Conclusiones}
+\begin{enumerate}[leftmargin=*]
+\item En los ejercicios 19--23, la integración numérica permite transformar mediciones de velocidad, fuerza, perfiles y caudales en resultados útiles para sistemas de monitoreo.
+\item Para la catenaria (22), Simpson $1/3$ aproxima $43.898841$ ft con error relativo cercano a $0.00085\%$.
+\item En el caudal (23), el comportamiento de la función cerca del extremo limita la precisión con solo ocho subintervalos.
+\item Para la cardioide (24), Simpson $1/3$ aproxima la longitud exacta de $80$ unidades mediante $80.010767$.
+\item Para la energía gravitatoria (25), Simpson $1/3$ produce $3.486236900\times10^9$ J, próximo al resultado analítico.
+\item Los ejercicios 26 y 27 muestran que la interpretación física depende de la procedencia de los datos y de la fórmula geométrica elegida.
+\item NumeriX AI articula los dos enfoques académicos en un proyecto web y facilita la presentación de cálculos y comparaciones numéricas.
+\end{enumerate}
+\section{Referencias}
+\begin{enumerate}
+\item Burden, R. L., \& Faires, J. D. (2011). \textit{Numerical Analysis} (9th ed.). Brooks/Cole.
+\item Chapra, S. C., \& Canale, R. P. (2015). \textit{Numerical Methods for Engineers} (7th ed.). McGraw-Hill.
+\item Kreyszig, E. (2011). \textit{Advanced Engineering Mathematics} (10th ed.). Wiley.
+\item \textit{Desafío grupal de Métodos Numéricos: Integración numérica aplicada a problemas de La Paz, Bolivia}. Material de la asignatura.
+\end{enumerate}
+\end{document}
